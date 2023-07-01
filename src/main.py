@@ -3,20 +3,21 @@ import logging
 import requests
 import json
 import time
+import os
 
 
 class Main:
     def __init__(self):
         self._hub_connection = None
-        self.HOST = None  # Setup your host here
-        self.TOKEN = None  # Setup your token here
-        self.TICKETS = None  # Setup your tickets here
-        self.T_MAX = None  # Setup your max temperature here
-        self.T_MIN = None  # Setup your min temperature here
-        self.DATABASE = None  # Setup your database here
+        self.HOST = os.getenv("HOST")  # Setup your host here
+        self.TOKEN = os.getenv("TOKEN")  # Setup your token here
+        self.TICKETS = os.getenv("TICKETS")  # Setup your tickets here
+        self.T_MAX = os.getenv("T_MAX")  # Setup your max temperature here
+        self.T_MIN = os.getenv("T_MIN")  # Setup your min temperature here
+        print(f"Token: {self.TOKEN}; Host: {self.HOST}")
 
     def __del__(self):
-        if self._hub_connection != None:
+        if self._hub_connection is not None:
             self._hub_connection.stop()
 
     def setup(self):
@@ -31,6 +32,7 @@ class Main:
             time.sleep(2)
 
     def setSensorHub(self):
+        print("Attempting connection...")
         self._hub_connection = (
             HubConnectionBuilder()
             .with_url(f"{self.HOST}/SensorHub?token={self.TOKEN}")
