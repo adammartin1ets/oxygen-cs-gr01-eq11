@@ -6,14 +6,4 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
-
-  ms-sql-db:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: ms-sql-db
-    ports:
-      - "1434:1433"
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=PasswordLog680!
-    volumes:
-      - ./data:/var/opt/mssql/data
+    network_mode: "host"

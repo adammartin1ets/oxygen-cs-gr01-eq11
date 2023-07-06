@@ -3,6 +3,8 @@ import logging
 import requests
 import json
 import time
+from datetime import datetime
+from db_manager import DBManager
 import os
 
 
@@ -21,7 +23,7 @@ class Main:
             self._hub_connection.stop()
 
     def setup(self):
-        self.setSensorHub()
+        self.set_sensor_hub()
 
     def start(self):
         self.setup()
@@ -31,7 +33,7 @@ class Main:
         while True:
             time.sleep(2)
 
-    def setSensorHub(self):
+    def set_sensor_hub(self):
         print("Attempting connection...")
         self._hub_connection = (
             HubConnectionBuilder()
@@ -48,39 +50,54 @@ class Main:
             .build()
         )
 
-        self._hub_connection.on("ReceiveSensorData", self.onSensorDataReceived)
+        self._hub_connection.on("ReceiveSensorData", self.on_sensor_data_received)
         self._hub_connection.on_open(lambda: print("||| Connection opened."))
         self._hub_connection.on_close(lambda: print("||| Connection closed."))
         self._hub_connection.on_error(lambda data: print(f"||| An exception was thrown closed: {data.error}"))
 
-    def onSensorDataReceived(self, data):
+    def on_sensor_data_received(self, data):
         try:
+            print("Receiving data...")
             print(data[0]["date"] + " --> " + data[0]["data"])
             date = data[0]["date"]
             dp = float(data[0]["data"])
-            self.send_temperature_to_fastapi(date, dp)
-            self.analyzeDatapoint(date, dp)
+            self.send_event_to_database(date, dp)
+            self.analyze_datapoint(date, dp)
         except Exception as err:
             print(err)
 
-    def analyzeDatapoint(self, date, data):
+    def analyze_datapoint(self, date, data):
         if float(data) >= float(self.T_MAX):
-            self.sendActionToHvac(date, "TurnOnAc", self.TICKETS)
+            self.send_action_to_hvac(date, "TurnOnAc", self.TICKETS)
         elif float(data) <= float(self.T_MIN):
-            self.sendActionToHvac(date, "TurnOnHeater", self.TICKETS)
+            self.send_action_to_hvac(date, "TurnOnHeater", self.TICKETS)
 
-    def sendActionToHvac(self, date, action, nbTick):
+    def send_action_to_hvac(self, date, action, nbTick):
         r = requests.get(f"{self.HOST}/api/hvac/{self.TOKEN}/{action}/{nbTick}")
         details = json.loads(r.text)
         print(details)
 
     def send_event_to_database(self, timestamp, event):
+        table_name = "OxygenCSTemperatureData"
+        column_names = ', '.join(["DateCreated", "Temperature"])
+
+        # Removing element after character '+' to convert to datetime object
+        timestamp_string_truncated = timestamp.split('+', 1)[0]
+
+        # Slicing last element of string and converting to datetime object for database insertion
+        timestamp_datetime_converted = datetime.strptime(timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
+
         try:
-            # To implement
-            pass
+            with DBManager() as db:
+                print("Inserting data in database")
+                cursor = db.cursor
+                sql_query = f'''INSERT INTO {table_name} ({column_names}) VALUES (?, ?)'''
+                cursor.execute(sql_query, [timestamp_datetime_converted, event])
+                db.commit()
+                print("Inserting values in database...")
+
         except requests.exceptions.RequestException as e:
-            # To implement
-            pass
+            print(f"Exception occurred while attempting to insert data in database. Stacktrace: {e}")
 
 
 if __name__ == "__main__":
