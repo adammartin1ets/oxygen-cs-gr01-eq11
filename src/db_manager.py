@@ -5,7 +5,6 @@ import os
 
 class DBManager:
 
-    #DB_CONNECTION_STRING = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=127.0.0.1\ms-sql-db,1434;DATABASE=Oxygen-CS;UID=sa;PWD=PasswordLog680!;TrustServerCertificate=yes;'
     DB_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
 
     def __init__(self):
