@@ -5,18 +5,27 @@ import os
 from datetime import datetime
 import requests
 from signalrcore.hub_connection_builder import HubConnectionBuilder
-from .db_manager import DBManager
+import db_manager
+
+
+class UndefinedTokenValue(Exception):
+    def __init__(self, default_value):
+        message = f"A token value has not been defined, default value returned: {default_value}"
+        super().__init__(message)
 
 
 class Main:
     def __init__(self):
         self._hub_connection = None
-        self.host = os.getenv("HOST")  # Setup your host here
-        self.token = os.getenv("TOKEN")  # Setup your token here
-        self.tickets = os.getenv("TICKETS")  # Setup your tickets here
-        self.t_max = os.getenv("T_MAX")  # Setup your max temperature here
-        self.t_min = os.getenv("T_MIN")  # Setup your min temperature here
-        print(f"Token: {self.token}; Host: {self.host}")
+        self.host = os.getenv("HOST")
+        self.token = os.getenv("TOKEN")
+
+        if self.token == 'TokenDefaultValue':
+            raise UndefinedTokenValue(default_value='TokenDefaultValue')
+
+        self.tickets = os.getenv("TICKETS")
+        self.t_max = os.getenv("T_MAX")
+        self.t_min = os.getenv("T_MIN")
 
     def __del__(self):
         if self._hub_connection is not None:
@@ -91,7 +100,7 @@ class Main:
             timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
 
         try:
-            with DBManager() as database:
+            with db_manager.DBManager() as database:
                 print("Inserting data in database")
                 cursor = database.cursor
                 sql_query = f'''INSERT INTO {table_name} ({column_names}) VALUES (?, ?)'''
