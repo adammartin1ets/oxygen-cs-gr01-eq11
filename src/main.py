@@ -1,22 +1,22 @@
-from signalrcore.hub_connection_builder import HubConnectionBuilder
-import logging
-import requests
-import json
 import time
-from datetime import datetime
-from .db_manager import DBManager
+import logging
+import json
 import os
+from datetime import datetime
+import requests
+from signalrcore.hub_connection_builder import HubConnectionBuilder
+from .db_manager import DBManager
 
 
 class Main:
     def __init__(self):
         self._hub_connection = None
-        self.HOST = os.getenv("HOST")  # Setup your host here
-        self.TOKEN = os.getenv("TOKEN")  # Setup your token here
-        self.TICKETS = os.getenv("TICKETS")  # Setup your tickets here
-        self.T_MAX = os.getenv("T_MAX")  # Setup your max temperature here
-        self.T_MIN = os.getenv("T_MIN")  # Setup your min temperature here
-        print(f"Token: {self.TOKEN}; Host: {self.HOST}")
+        self.host = os.getenv("HOST")  # Setup your host here
+        self.token = os.getenv("TOKEN")  # Setup your token here
+        self.tickets = os.getenv("TICKETS")  # Setup your tickets here
+        self.t_max = os.getenv("T_MAX")  # Setup your max temperature here
+        self.t_min = os.getenv("T_MIN")  # Setup your min temperature here
+        print(f"Token: {self.token}; Host: {self.host}")
 
     def __del__(self):
         if self._hub_connection is not None:
@@ -37,7 +37,7 @@ class Main:
         print("Attempting connection...")
         self._hub_connection = (
             HubConnectionBuilder()
-            .with_url(f"{self.HOST}/SensorHub?token={self.TOKEN}")
+            .with_url(f"{self.host}/SensorHub?token={self.token}")
             .configure_logging(logging.INFO)
             .with_automatic_reconnect(
                 {
@@ -53,28 +53,29 @@ class Main:
         self._hub_connection.on("ReceiveSensorData", self.on_sensor_data_received)
         self._hub_connection.on_open(lambda: print("||| Connection opened."))
         self._hub_connection.on_close(lambda: print("||| Connection closed."))
-        self._hub_connection.on_error(lambda data: print(f"||| An exception was thrown closed: {data.error}"))
+        self._hub_connection.on_error(lambda data: print(
+            f"||| An exception was thrown closed: {data.error}"))
 
     def on_sensor_data_received(self, data):
         try:
             print("Receiving data...")
             print(data[0]["date"] + " --> " + data[0]["data"])
             date = data[0]["date"]
-            dp = float(data[0]["data"])
-            self.send_event_to_database(date, dp)
-            self.analyze_datapoint(date, dp)
+            data = float(data[0]["data"])
+            self.send_event_to_database(date, data)
+            self.analyze_datapoint(date, data)
         except Exception as err:
             print(err)
 
     def analyze_datapoint(self, date, data):
-        if float(data) >= float(self.T_MAX):
-            self.send_action_to_hvac(date, "TurnOnAc", self.TICKETS)
-        elif float(data) <= float(self.T_MIN):
-            self.send_action_to_hvac(date, "TurnOnHeater", self.TICKETS)
+        if float(data) >= float(self.t_max):
+            self.send_action_to_hvac(date, "TurnOnAc", self.tickets)
+        elif float(data) <= float(self.t_min):
+            self.send_action_to_hvac(date, "TurnOnHeater", self.tickets)
 
-    def send_action_to_hvac(self, date, action, nbTick):
-        r = requests.get(f"{self.HOST}/api/hvac/{self.TOKEN}/{action}/{nbTick}")
-        details = json.loads(r.text)
+    def send_action_to_hvac(self, date, action, nb_tick):
+        result = requests.get(f"{self.host}/api/hvac/{self.token}/{action}/{nb_tick}")
+        details = json.loads(result.text)
         print(details)
 
     def send_event_to_database(self, timestamp, event):
@@ -84,20 +85,23 @@ class Main:
         # Removing element after character '+' to convert to datetime object
         timestamp_string_truncated = timestamp.split('+', 1)[0]
 
-        # Slicing last element of string and converting to datetime object for database insertion
-        timestamp_datetime_converted = datetime.strptime(timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
+        # Slicing last element of string and 
+        # converting to datetime object for database insertion
+        timestamp_datetime_converted = datetime.strptime(
+            timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
 
         try:
-            with DBManager() as db:
+            with DBManager() as database:
                 print("Inserting data in database")
-                cursor = db.cursor
+                cursor = database.cursor
                 sql_query = f'''INSERT INTO {table_name} ({column_names}) VALUES (?, ?)'''
                 cursor.execute(sql_query, [timestamp_datetime_converted, event])
-                db.commit()
+                database.commit()
                 print("Inserting values in database...")
 
-        except requests.exceptions.RequestException as e:
-            print(f"Exception occurred while attempting to insert data in database. Stacktrace: {e}")
+        except requests.exceptions.RequestException as error:
+            print("Exception occurred while attempting to insert data in database. "
+            f"Stacktrace: {error}")
 
 
 if __name__ == "__main__":
