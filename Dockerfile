@@ -21,6 +21,14 @@ RUN apk add --allow-untrusted mssql-tools18_18.0.1.1-1_amd64.apk
 
 ENV PYTHONBUFFERED 0
 
+ENV DB_CONNECTION_STRING=""
+ENV T_MIN=0
+ENV T_MAX=100
+ENV TICKETS=5
+ENV TOKEN='DefaultToken'
+ENV HOST='DefaultHost'
+
+
 WORKDIR /app
 
 COPY requirements.txt .
