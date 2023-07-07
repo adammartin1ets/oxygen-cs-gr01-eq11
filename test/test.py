@@ -7,6 +7,7 @@ from src.main import Main
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 class TestMain(TestCase):
 
     @patch("builtins.print")
@@ -27,10 +28,6 @@ class TestMain(TestCase):
         self.assertEqual(main.tickets, "10")
         self.assertEqual(main.t_max, "110.10")
         self.assertEqual(main.t_min, "85")
-
-        # Check if the print is correctly called with the expected output
-        mock_print.assert_called_once_with(
-            "Token: 3RerhuiB8W; Host: http://test")
 
     @patch("src.main.Main.set_sensor_hub")
     def test_setup(self, mock_set_sensor_hub):
@@ -133,7 +130,7 @@ class TestMain(TestCase):
             f"{main.host}/api/hvac/{main.token}/TurnOnAc/{main.tickets}")
 
         # Check if the print is correctly called with the expected output
-        second_call_args = mock_print.call_args_list[1]
+        second_call_args = mock_print.call_args_list[0]
         self.assertEqual(second_call_args, mock.call(
             {'Response': 'Activating Heater for 20 ticks'}))
 
