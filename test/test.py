@@ -11,12 +11,15 @@ class TestMain(TestCase):
 
     @patch("builtins.print")
     def test_init(self, mock_print):
+        """
+        Test case for the init method of Main.
+        """
 
-        os.environ["HOST"] = "http://test"
-        os.environ["TOKEN"] = "3RerhuiB8W"
-        os.environ["TICKETS"] = "10"
-        os.environ["T_MAX"] = "110.10"
-        os.environ["T_MIN"] = "85"
+        os.environ["host"] = "http://test"
+        os.environ["token"] = "3RerhuiB8W"
+        os.environ["tickets"] = "10"
+        os.environ["t_max"] = "110.10"
+        os.environ["t_min"] = "85"
 
         main = Main()
 
@@ -32,6 +35,9 @@ class TestMain(TestCase):
 
     @patch("src.main.Main.set_sensor_hub")
     def test_setup(self, mock_set_sensor_hub):
+        """
+        Test case for the init method of Main.
+        """
         main = Main()
         main.setup()
         mock_set_sensor_hub.assert_called_once()
@@ -39,14 +45,16 @@ class TestMain(TestCase):
     @patch("src.main.HubConnectionBuilder")
     @patch("builtins.print")
     def test_set_sensor_hub(self, mock_hub_connection_builder):
-        # Create a MagicMock object for the HubConnectionBuilder instance
+        """
+        Test case for the set_sensor_hub method of Main.
+        """
+
         mock_hub_connection = MagicMock()
         mock_hub_connection_builder.return_value = mock_hub_connection
 
         main = Main()
         main.set_sensor_hub()
 
-        # Assert that HubConnectionBuilder was called with the correct URL
         mock_hub_connection_builder.assert_called_once()
         mock_hub_connection.with_url.assert_called_once_with(
             f"{main.host}/SensorHub?token={main.token}")
@@ -54,7 +62,12 @@ class TestMain(TestCase):
     @patch("src.main.Main.analyze_datapoint")
     @patch("src.main.Main.send_event_to_database")
     @patch("builtins.print")
-    def test_on_sensor_data_received(self, mock_print, mock_analyze_datapoint, mock_send_event_to_database):
+    def test_on_sensor_data_received(self, mock_print, 
+                                     mock_analyze_datapoint, 
+                                     mock_send_event_to_database):
+        """
+        Test case for the set_sensor_hub method of Main.
+        """
         main = Main()
 
         # Test case: valid sensor data
@@ -82,9 +95,12 @@ class TestMain(TestCase):
 
     @patch("src.main.Main.send_action_to_hvac")
     def test_analyze_datapoint(self, mock_send_action_to_hvac):
+        """
+        Test case for the set_sensor_hub method of Main.
+        """
         main = Main()
-        main.T_MAX = 25.0
-        main.T_MIN = 15.0
+        main.t_max = 25.0
+        main.t_min = 15.0
 
         # Test case: data < T_MAX AND data > T_MIN
         main.analyze_datapoint("2023-07-03", 20.0)
@@ -103,6 +119,9 @@ class TestMain(TestCase):
     @patch("src.main.requests.get")
     @patch("builtins.print")
     def test_send_action_to_hvac(self, mock_print, mock_get):
+        """
+        Test case for the set_sensor_hub method of Main.
+        """
         main = Main()
 
         # Create a mock response with a valid JSON string
