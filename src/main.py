@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 import requests
 from signalrcore.hub_connection_builder import HubConnectionBuilder
-import db_manager
+from .db_manager import DBManager
 
 
 class UndefinedTokenValue(Exception):
@@ -100,7 +100,7 @@ class Main:
             timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
 
         try:
-            with db_manager.DBManager() as database:
+            with DBManager() as database:
                 print("Inserting data in database")
                 cursor = database.cursor
                 sql_query = f'''INSERT INTO {table_name} ({column_names}) VALUES (?, ?)'''

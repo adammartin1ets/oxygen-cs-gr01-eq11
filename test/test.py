@@ -3,7 +3,7 @@ from unittest import mock, TestCase
 from unittest.mock import patch, MagicMock
 import sys
 import os
-import src.main as m
+from src.main import Main
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -21,7 +21,7 @@ class TestMain(TestCase):
         os.environ["T_MAX"] = "110.10"
         os.environ["T_MIN"] = "85"
 
-        main = m.Main()
+        main = Main()
 
         self.assertEqual(main.host, "http://test")
         self.assertEqual(main.token, "3RerhuiB8W")
@@ -38,7 +38,7 @@ class TestMain(TestCase):
         """
         Test case for the init method of Main.
         """
-        main = m.Main()
+        main = Main()
         main.setup()
         mock_set_sensor_hub.assert_called_once()
 
@@ -50,7 +50,7 @@ class TestMain(TestCase):
         mock_hub_connection = MagicMock()
         mock_hub_connection_builder.return_value = mock_hub_connection
 
-        main = m.Main()
+        main = Main()
         main.set_sensor_hub()
 
         mock_hub_connection_builder.assert_called_once()
@@ -66,7 +66,7 @@ class TestMain(TestCase):
         """
         Test case for the set_sensor_hub method of Main.
         """
-        main = m.Main()
+        main = Main()
 
         # Test case: valid sensor data
         data = [{"date": "2023-07-05T00:19:17.1400381+00:00", "data": "94.28"}]
@@ -96,7 +96,7 @@ class TestMain(TestCase):
         """
         Test case for the set_sensor_hub method of Main.
         """
-        main = m.Main()
+        main = Main()
         main.t_max = 25.0
         main.t_min = 15.0
 
@@ -120,7 +120,7 @@ class TestMain(TestCase):
         """
         Test case for the set_sensor_hub method of Main.
         """
-        main = m.Main()
+        main = Main()
 
         # Create a mock response with a valid JSON string
         mock_response = MagicMock()

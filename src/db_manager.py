@@ -5,6 +5,7 @@ import warnings
 import os
 import pyodbc
 
+
 class DBManager:
     """
     A class for managing the database connection and operations.
