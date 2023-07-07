@@ -4,7 +4,7 @@ import requests
 import json
 import time
 from datetime import datetime
-from db_manager import DBManager
+from .db_manager import DBManager
 import os
 
 
