@@ -130,7 +130,7 @@ class TestMain(TestCase):
             f"{main.host}/api/hvac/{main.token}/TurnOnAc/{main.tickets}")
 
         # Check if the print is correctly called with the expected output
-        second_call_args = mock_print.call_args_list[1]
+        second_call_args = mock_print.call_args_list[0]
         self.assertEqual(second_call_args, mock.call(
             {'Response': 'Activating Heater for 20 ticks'}))
 
