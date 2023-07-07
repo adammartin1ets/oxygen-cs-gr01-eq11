@@ -3,6 +3,7 @@ from unittest import mock, TestCase
 from unittest.mock import patch, MagicMock
 import sys
 import os
+from src.db_manager import DBManager
 from src.main import Main
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

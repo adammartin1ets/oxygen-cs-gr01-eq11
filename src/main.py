@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 import requests
 from signalrcore.hub_connection_builder import HubConnectionBuilder
-from .db_manager import DBManager
+from db_manager import DBManager
 
 
 class UndefinedTokenValue(Exception):
