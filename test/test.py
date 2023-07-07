@@ -56,7 +56,7 @@ class TestMain(TestCase):
 
     # Test case: valid sensor data
     data = [ {"date": "2023-07-05T00:19:17.1400381+00:00", "data": "94.28"}]
-    main.on_sensor_data_received("2023-07-05T00:19:17.1400381+00:00", "94.28")
+    main.on_sensor_data_received("2023-07-05T00:19:17.1400381+00:00", 94.28)
     mock_analyze_datapoint.assert_called_with("2023-07-05T00:19:17.1400381+00:00", 94.28)
 
     # Test case: empty sensor data
