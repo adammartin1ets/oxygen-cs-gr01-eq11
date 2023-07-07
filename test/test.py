@@ -14,12 +14,11 @@ class TestMain(TestCase):
         """
         Test case for the init method of Main.
         """
-
-        os.environ["host"] = "http://test"
-        os.environ["token"] = "3RerhuiB8W"
-        os.environ["tickets"] = "10"
-        os.environ["t_max"] = "110.10"
-        os.environ["t_min"] = "85"
+        os.environ["HOST"] = "http://test"
+        os.environ["TOKEN"] = "3RerhuiB8W"
+        os.environ["TICKETS"] = "10"
+        os.environ["T_MAX"] = "110.10"
+        os.environ["T_MIN"] = "85"
 
         main = Main()
 
