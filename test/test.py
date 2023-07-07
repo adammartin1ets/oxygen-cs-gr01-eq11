@@ -43,12 +43,10 @@ class TestMain(TestCase):
         mock_set_sensor_hub.assert_called_once()
 
     @patch("src.main.HubConnectionBuilder")
-    @patch("builtins.print")
     def test_set_sensor_hub(self, mock_hub_connection_builder):
         """
         Test case for the set_sensor_hub method of Main.
         """
-
         mock_hub_connection = MagicMock()
         mock_hub_connection_builder.return_value = mock_hub_connection
 
