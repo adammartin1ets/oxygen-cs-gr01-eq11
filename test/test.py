@@ -50,13 +50,15 @@ class TestMain(TestCase):
     mock_hub_connection.with_url.assert_called_once_with(f"{main.HOST}/SensorHub?token={main.TOKEN}")
     
   @patch("src.main.Main.analyze_datapoint")
+  @patch("src.main.Main.send_event_to_database")
   @patch("builtins.print")
-  def test_(self, mock_print, mock_analyze_datapoint):
+  def test_on_sensor_data_received(self, mock_print, mock_analyze_datapoint, mock_send_event_to_database):
     main = Main()
 
     # Test case: valid sensor data
-    data = [ {"date": "2023-07-05T00:19:17.1400381+00:00", "data": "94.28"}]
-    main.on_sensor_data_received("2023-07-05T00:19:17.1400381+00:00", 94.28)
+    data = [{"date": "2023-07-05T00:19:17.1400381+00:00", "data": "94.28"}]
+    main.on_sensor_data_received(data)
+    mock_send_event_to_database.assert_called_with("2023-07-05T00:19:17.1400381+00:00", 94.28)
     mock_analyze_datapoint.assert_called_with("2023-07-05T00:19:17.1400381+00:00", 94.28)
 
     # Test case: empty sensor data
