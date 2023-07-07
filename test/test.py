@@ -29,7 +29,7 @@ class TestMain(TestCase):
     # Check if the print is correctly called with the expected output
     mock_print.assert_called_once_with("Token: 3RerhuiB8W; Host: http://test")
   
-  @patch("src.main.Main.setSensorHub")
+  @patch("src.main.Main.set_sensor_hub")
   def test_setup(self, mock_set_sensor_hub):
       main = Main()
       main.setup()
@@ -37,62 +37,64 @@ class TestMain(TestCase):
   
   @patch("src.main.HubConnectionBuilder")
   @patch("builtins.print")
-  def test_setSensorHub(self, mock_print, mock_hub_connection_builder):
+  def test_set_sensor_hub(self, mock_print, mock_hub_connection_builder):
     # Create a MagicMock object for the HubConnectionBuilder instance
     mock_hub_connection = MagicMock()
     mock_hub_connection_builder.return_value = mock_hub_connection
     
     main = Main()
-    main.setSensorHub()
+    main.set_sensor_hub()
     
     # Assert that HubConnectionBuilder was called with the correct URL
     mock_hub_connection_builder.assert_called_once()
     mock_hub_connection.with_url.assert_called_once_with(f"{main.HOST}/SensorHub?token={main.TOKEN}")
     
-  @patch("src.main.Main.analyzeDatapoint")
+  @patch("src.main.Main.analyze_datapoint")
+  @patch("src.main.Main.send_event_to_database")
   @patch("builtins.print")
-  def test_onSensorDataReceived(self, mock_print, mock_analyzeDatapoint):
+  def test_on_sensor_data_received(self, mock_print, mock_analyze_datapoint, mock_send_event_to_database):
     main = Main()
 
     # Test case: valid sensor data
-    data = [ {"date": "2023-07-05T00:19:17.1400381+00:00", "data": "94.28"}]
-    main.onSensorDataReceived(data)
-    mock_analyzeDatapoint.assert_called_with("2023-07-05T00:19:17.1400381+00:00", 94.28)
+    data = [{"date": "2023-07-05T00:19:17.1400381+00:00", "data": "94.28"}]
+    main.on_sensor_data_received(data)
+    mock_send_event_to_database.assert_called_with("2023-07-05T00:19:17.1400381+00:00", 94.28)
+    mock_analyze_datapoint.assert_called_with("2023-07-05T00:19:17.1400381+00:00", 94.28)
 
     # Test case: empty sensor data
     no_data = []
-    main.onSensorDataReceived(no_data)
+    main.on_sensor_data_received(no_data)
     # call_args_list --> call --> args[0]
     index_error_found = any(isinstance(call.args[0], IndexError) for call in mock_print.call_args_list)
     self.assertTrue(index_error_found, "IndexError not found")
     
     # Test case: Invalid sensor data
     invalid_data = [{"date": "2023-07-03", "data": "invalid"}]
-    main.onSensorDataReceived(invalid_data)
+    main.on_sensor_data_received(invalid_data)
     value_error_found = any(isinstance(call.args[0], ValueError) for call in mock_print.call_args_list)
     self.assertTrue(value_error_found, "ValueError not found")
 
-  @patch("src.main.Main.sendActionToHvac")
-  def test_analyzeDatapoint(self, mock_sendActionToHvac):
+  @patch("src.main.Main.send_action_to_hvac")
+  def test_analyze_datapoint(self, mock_send_action_to_hvac):
     main = Main()
     main.T_MAX = 25.0
     main.T_MIN = 15.0
 
     # Test case: data < T_MAX AND data > T_MIN
-    main.analyzeDatapoint("2023-07-03", 20.0)
-    mock_sendActionToHvac.assert_not_called()
+    main.analyze_datapoint("2023-07-03", 20.0)
+    mock_send_action_to_hvac.assert_not_called()
 
     # Test case: data >= T_MAX
-    main.analyzeDatapoint("2023-07-01", 30.0)
-    mock_sendActionToHvac.assert_called_once_with("2023-07-01", "TurnOnAc", main.TICKETS)
+    main.analyze_datapoint("2023-07-01", 30.0)
+    mock_send_action_to_hvac.assert_called_once_with("2023-07-01", "TurnOnAc", main.TICKETS)
 
     # Test case: data <= T_MIN
-    main.analyzeDatapoint("2023-07-02", 10.0)
-    mock_sendActionToHvac.assert_called_with("2023-07-02", "TurnOnHeater", main.TICKETS)
+    main.analyze_datapoint("2023-07-02", 10.0)
+    mock_send_action_to_hvac.assert_called_with("2023-07-02", "TurnOnHeater", main.TICKETS)
 
   @patch("src.main.requests.get")
   @patch("builtins.print")
-  def test_sendActionToHvac(self, mock_print, mock_get):
+  def test_send_action_to_hvac(self, mock_print, mock_get):
     main = Main()
 
     # Create a mock response with a valid JSON string
@@ -101,7 +103,7 @@ class TestMain(TestCase):
 
     mock_get.return_value = mock_response
 
-    main.sendActionToHvac("2023-07-01", "TurnOnAc", main.TICKETS)
+    main.send_action_to_hvac("2023-07-01", "TurnOnAc", main.TICKETS)
 
     mock_get.assert_called_once_with(f"{main.HOST}/api/hvac/{main.TOKEN}/TurnOnAc/{main.TICKETS}")
 
