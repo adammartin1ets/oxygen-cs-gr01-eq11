@@ -65,6 +65,8 @@ jobs:
       with:
         context: .
         push: true
-        tags: adammartin1ets/oxygen-cs-gr01-eq11:latest
+        tags: |
+              adammartin1ets/oxygen-cs-gr01-eq11:latest
+              adammartin1ets/oxygen-cs-gr01-eq11:${{ github.run_id }}
       
     
