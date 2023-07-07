@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  ms-sql-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: ms-sql-db
+    ports:
+      - "1434:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=PasswordLog680!
+    volumes:
+      - ./data:/var/opt/mssql/data

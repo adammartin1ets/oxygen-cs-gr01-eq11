@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  oxygene-cs-app:
+    container_name: oxygene-cs-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: ${ENV_FILE:-.env.example}
+    network_mode: "host"
