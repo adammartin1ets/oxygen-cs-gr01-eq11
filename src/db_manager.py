@@ -1,12 +1,12 @@
+"""
+A class for managing the database connection and operations.
+"""
 import warnings
 import os
 import pyodbc
 
 class DBManager:
-    """
-    A class for managing the database connection and operations.
-    """
-
+    
     DB_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
 
     def __init__(self):
