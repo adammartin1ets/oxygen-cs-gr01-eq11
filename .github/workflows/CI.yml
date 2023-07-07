@@ -1,19 +1,23 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-        ## Unit tests 
+      ## Unit tests
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9'  
+          python-version: '3.9'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -21,13 +25,15 @@ jobs:
           pip install -r requirements.txt
       - name: Run unit tests
         run: python -m unittest discover -s test  
+        
+      ## Stop if tests fail
       - name: Stop if tests fail
         if: ${{ failure() }}
         run: exit 1
         
-        ## Pylint
+      ## Pylint
       - name: Checkout
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
@@ -55,10 +61,3 @@ jobs:
           context: .
           push: true
           tags: adammartin1ets/oxygen-cs-gr01-eq11:latest
-
-
-    
-    
-      
-    
-  
