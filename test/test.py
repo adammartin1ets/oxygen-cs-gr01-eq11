@@ -56,19 +56,19 @@ class TestMain(TestCase):
 
     # Test case: valid sensor data
     data = [ {"date": "2023-07-05T00:19:17.1400381+00:00", "data": "94.28"}]
-    main.(data)
+    main.on_sensor_data_received(data)
     mock_analyze_datapoint.assert_called_with("2023-07-05T00:19:17.1400381+00:00", 94.28)
 
     # Test case: empty sensor data
     no_data = []
-    main.(no_data)
+    main.on_sensor_data_received(no_data)
     # call_args_list --> call --> args[0]
     index_error_found = any(isinstance(call.args[0], IndexError) for call in mock_print.call_args_list)
     self.assertTrue(index_error_found, "IndexError not found")
     
     # Test case: Invalid sensor data
     invalid_data = [{"date": "2023-07-03", "data": "invalid"}]
-    main.(invalid_data)
+    main.on_sensor_data_received(invalid_data)
     value_error_found = any(isinstance(call.args[0], ValueError) for call in mock_print.call_args_list)
     self.assertTrue(value_error_found, "ValueError not found")
 
