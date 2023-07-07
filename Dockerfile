@@ -1,8 +1,5 @@
 FROM python:3.9-alpine
 
-RUN apk update
-RUN apk add --no-cache --virtual .build-deps ca-certificates gcc linux-headers unixodbc-dev musl-dev jpeg-dev zlib-dev build-base curl gnupg krb5-libs libgcc libssl1.1 gcompat
-
 #Download the desired package(s)
 RUN curl -O https://download.microsoft.com/download/b/9/f/b9f3cce4-3925-46d4-9f46-da08869c6486/msodbcsql18_18.0.1.1-1_amd64.apk
 RUN curl -O https://download.microsoft.com/download/b/9/f/b9f3cce4-3925-46d4-9f46-da08869c6486/mssql-tools18_18.0.1.1-1_amd64.apk
