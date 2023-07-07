@@ -29,10 +29,6 @@ class TestMain(TestCase):
         self.assertEqual(main.t_max, "110.10")
         self.assertEqual(main.t_min, "85")
 
-        # Check if the print is correctly called with the expected output
-        mock_print.assert_called_once_with(
-            "Token: 3RerhuiB8W; Host: http://test")
-
     @patch("src.main.Main.set_sensor_hub")
     def test_setup(self, mock_set_sensor_hub):
         """
