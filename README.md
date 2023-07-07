@@ -3,57 +3,69 @@
 ![image](./doc/wheel.png)
 
 This Python application continuously monitors a sensor hub and manages HVAC (Heating, Ventilation, and Air Conditioning) system actions based on received sensor data.
-
 It leverages `signalrcore` to maintain a real-time connection to the sensor hub and utilizes `requests` to send GET requests to a remote HVAC control endpoint.
-
 This application uses `pipenv`, a tool that aims to bring the best of all packaging worlds to the Python world.
 
-## Requierements
+## Requirements
 
 - Python 3.8+
 - pipenv
+- Docker: Install Docker by following the instructions in the official Docker documentation.
 
 ## Getting Started
 
-1. Clone the repository :
+To run the project, follow these steps:
 
-```
-git clone https://github.com/MarioGith/log680.git
-cd log680
-```
+1. Create an .env file in the root directory of the project. **IMPORTANT: Add the .env file immediately to the .gitignore. This file will contain your secrets and must not be pushed in version control.**
 
-2. Install the project's dependencies :
+````shell
+HOST='http://0.0.0.0'
+TOKEN='TokenDefaultValue'
+TICKETS=5
+T_MIN=50
+T_MAX=100
+DB_CONNECTION_STRING='DRIVER={ODBC Driver 18 for SQL Server};SERVER=ServerName;DATABASE=DBName;UID=Username;PWD=Password;TrustServerCertificate=yes;'
+````
+2. Set your .env file for docker-compose with the command:
+````shell
+$env:ENV_FILE = '.env'
+````
+You can verify that the value of ENV_FILE env variable is .env with:
+````shell
+echo $env:ENV_FILE
+````
 
-```
-pipenv install
-```
+3. Running the Project with Docker Compose
+   To run the project using Docker Compose, execute the following command in the terminal:
 
-## Setup
+````shell
+docker compose up --build
 
-You need to setup the following variables inside the Main class:
+````
 
-- HOST: The host of the sensor hub and HVAC system.
-- TOKEN: The token for authenticating requests.
-- TICKETS: The number of tickets.
-- T_MAX: The maximum allowed temperature.
-- T_MIN: The minimum allowed temperature.
-- DATABASE: The database connection details.
-
-## Running the Program
-
-After setup, you can start the program with the following command:
-
-```
-pipenv run strart
-```
-
-## Logging
-
-The application logs important events such as connection open/close and error events to help in troubleshooting.
-
-## To Implement
-
-There are placeholders in the code for sending events to a database and handling request exceptions. These sections should be completed as per the requirements of your specific application.
+## Unit test
+````shell
+cd api/test
+python -m unittest
+````
+### To run the test with coverage
+1. Install coverage for local testing
+````shell
+pip install coverage
+````
+2. Run the tests
+````shell
+cd api/test
+python -m coverage run -m unittest
+````
+3. For a report on the console, run this command
+````shell
+python -m coverage report  
+````
+4. For a report on a html page, run this command
+````shell
+python -m coverage html  
+````
 
 ## License
 
