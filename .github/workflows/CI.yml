@@ -58,7 +58,7 @@ jobs:
       with:
         context: .
         load: true
-        tags: adammartin1ets/ocygen-cs:latest
+        tags: adammartin1ets/oxygen-cs-gr01-eq11:latest
       
     
   
