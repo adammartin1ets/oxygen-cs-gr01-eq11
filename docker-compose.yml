@@ -4,6 +4,6 @@ services:
     container_name: oxygene-cs-app
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: src/Dockerfile
     env_file: ${ENV_FILE:-.env.example}
     network_mode: "host"
