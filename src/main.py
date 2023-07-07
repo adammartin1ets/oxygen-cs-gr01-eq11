@@ -19,6 +19,7 @@ class DBManager:
     """
     A class for managing the database connection and operations.
     """
+
     DB_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
 
     def __init__(self):
@@ -72,8 +73,8 @@ class Main:
         self.host = os.getenv("HOST")
         self.token = os.getenv("TOKEN")
 
-        if self.token == 'TokenDefaultValue':
-            raise UndefinedTokenValue(default_value='TokenDefaultValue')
+        if self.token == "TokenDefaultValue":
+            raise UndefinedTokenValue(default_value="TokenDefaultValue")
 
         self.tickets = os.getenv("TICKETS")
         self.t_max = os.getenv("T_MAX")
@@ -114,8 +115,9 @@ class Main:
         self._hub_connection.on("ReceiveSensorData", self.on_sensor_data_received)
         self._hub_connection.on_open(lambda: print("||| Connection opened."))
         self._hub_connection.on_close(lambda: print("||| Connection closed."))
-        self._hub_connection.on_error(lambda data: print(
-            f"||| An exception was thrown closed: {data.error}"))
+        self._hub_connection.on_error(
+            lambda data: print(f"||| An exception was thrown closed: {data.error}")
+        )
 
     def on_sensor_data_received(self, data):
         try:
@@ -141,30 +143,37 @@ class Main:
 
     def send_event_to_database(self, timestamp, event):
         table_name = "OxygenCSTemperatureData"
-        column_names = ', '.join(["DateCreated", "Temperature"])
+        column_names = ", ".join(["DateCreated", "Temperature"])
 
         # Removing element after character '+' to convert to datetime object
-        timestamp_string_truncated = timestamp.split('+', 1)[0]
+        timestamp_string_truncated = timestamp.split("+", 1)[0]
 
-        # Slicing last element of string and 
+        # Slicing last element of string and
         # converting to datetime object for database insertion
         timestamp_datetime_converted = datetime.strptime(
-            timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
+            timestamp_string_truncated[:-1], "%Y-%m-%dT%H:%M:%S.%f"
+        )
 
         try:
             with DBManager() as database:
                 print("Inserting data in database")
                 cursor = database.cursor
-                sql_query = f'''INSERT INTO {table_name} ({column_names}) VALUES (?, ?)'''
+                sql_query = (
+                    f"""INSERT INTO {table_name} ({column_names}) VALUES (?, ?)"""
+                )
                 cursor.execute(sql_query, [timestamp_datetime_converted, event])
                 database.commit()
                 print("Inserting values in database...")
 
         except requests.exceptions.RequestException as error:
-            print("Exception occurred while attempting to insert data in database. "
-            f"Stacktrace: {error}")
+            print(
+                "Exception occurred while attempting to insert data in database. "
+                f"Stacktrace: {error}"
+            )
 
 
 if __name__ == "__main__":
     main = Main()
     main.start()
+
+# random comment
