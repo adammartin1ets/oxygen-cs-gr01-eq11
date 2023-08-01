@@ -80,16 +80,13 @@ jobs:
         echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
         sudo apt-get update
         sudo apt-get install -y kubectl
-
     # Authenticate with your Kubernetes cluster using the kubeconfig stored in the secrets
     - name: Authenticate with Kubernetes cluster
       run: |
-        echo "${{ secrets.KUBE_CONFIG_DATA }}" -d > kubeconfig.yaml
+        echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > kubeconfig.yaml
         kubectl --kubeconfig=kubeconfig.yaml version
-
     # Update the Kubernetes deployment with the latest Docker image
     - name: Deploy to Kubernetes cluster
       run: |
         kubectl --kubeconfig=kubeconfig.yaml set image deployment/images deploy=adammartin1ets/oxygen-cs-gr01-eq11:${{ github.run_id }}
       
-    
