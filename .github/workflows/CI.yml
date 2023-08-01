@@ -88,5 +88,5 @@ jobs:
     # Update the Kubernetes deployment with the latest Docker image
     - name: Deploy to Kubernetes cluster
       run: |
-        kubectl --kubeconfig=kubeconfig.yaml set image deployment/img-deployment deploy=adammartin1ets/oxygen-cs-gr01-eq11:${{ github.run_id }}
+        kubectl --kubeconfig=kubeconfig.yaml set image deployment/img-deployment ox-cs-img=adammartin1ets/oxygen-cs-gr01-eq11:${{ github.run_id }}
       
