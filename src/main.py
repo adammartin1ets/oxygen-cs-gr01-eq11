@@ -140,6 +140,7 @@ class Main:
         print(details)
 
     def send_event_to_database(self, timestamp, event):
+        print("Test New Image")
         table_name = "OxygenCSTemperatureData"
         column_names = ', '.join(["DateCreated", "Temperature"])
 
