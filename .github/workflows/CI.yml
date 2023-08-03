@@ -83,7 +83,7 @@ jobs:
     # Authenticate with your Kubernetes cluster using the kubeconfig stored in the secrets
     - name: Authenticate with Kubernetes cluster
       run: |
-        echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > kubeconfig.yaml
+        echo "${{ secrets.KUBE_CONFIG_DATA }}" kubeconfig.yaml
         kubectl --kubeconfig=kubeconfig.yaml version
     # Update the Kubernetes deployment with the latest Docker image
     - name: Deploy to Kubernetes cluster
