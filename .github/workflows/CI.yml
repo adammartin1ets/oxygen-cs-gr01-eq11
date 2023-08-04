@@ -62,6 +62,33 @@ jobs:
       with:
         context: .
         push: true
-        tags: adammartin1ets/oxygen-cs-gr01-eq11:latest
+        tags: |
+              adammartin1ets/oxygen-cs-gr01-eq11:latest
+              adammartin1ets/oxygen-cs-gr01-eq11:${{ github.run_id }}
+        
+  deploy_to_kubernetes:
+    needs: build_and_push_docker
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Install kubectl and other required tools for Kubernetes deployment
+    - name: Set up Kubernetes CLI
+      run: |
+        sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2
+        curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+        echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+        sudo apt-get update
+        sudo apt-get install -y kubectl
+    # Authenticate with your Kubernetes cluster using the kubeconfig stored in the secrets
+    - name: Authenticate with Kubernetes cluster
+      run: |
+        echo "${{ secrets.KUBE_CONFIG_DATA }}" > kubeconfig.yaml
+        kubectl --kubeconfig=kubeconfig.yaml version
+    # Update the Kubernetes deployment with the latest Docker image
+    - name: Deploy to Kubernetes cluster
+      run: |
+        kubectl --kubeconfig=kubeconfig.yaml set image deployment/oxygen-cs-img-deployment ox-cs-img=adammartin1ets/oxygen-cs-gr01-eq11:${{ github.run_id }}
       
-    
