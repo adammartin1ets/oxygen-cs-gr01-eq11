@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: img-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oxygen-cs
+  template:
+    metadata:
+      labels:
+        app: oxygen-cs
+    spec:
+      containers:
+        
+name: ox-cs-img
+        image: adammartin1ets/oxygen-cs-gr01-eq11:latest
+        env:
+name: HOST
+          valueFrom:
+            secretKeyRef:
+              name: oxygen-cs-secrets
+              key: HOST
+name: TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: oxygen-cs-secrets
+            key: TOKEN
+name: TICKETS
+      valueFrom:
+        secretKeyRef:
+          name: oxygen-cs-secrets
+          key: TICKETS
+name: T_MAX
+    valueFrom:
+      secretKeyRef:
+        name: oxygen-cs-secrets
+        key: T_MAX
+name: T_MIN
+  valueFrom:
+    secretKeyRef:
+      name: oxygen-cs-secrets
+      key: T_MIN
+resources:
+  limits:
+    cpu: "500m"
+    memory: "500Mi"
+  requests:
+    cpu: "300m"
+    memory: "300Mi"
+ports:
+containerPort: 80
