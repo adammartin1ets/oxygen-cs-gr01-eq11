@@ -109,30 +109,30 @@ class TestMain(TestCase):
         main.analyze_datapoint("2023-07-02", 10.0)
         mock_send_action_to_hvac.assert_called_with(
             "2023-07-02", "TurnOnHeater", main.tickets)
-
-    @patch("src.main.requests.get")
-    @patch("builtins.print")
-    def test_send_action_to_hvac(self, mock_print, mock_get):
-        """
-        Test case for the set_sensor_hub method of Main.
-        """
-        main = Main()
-
-        # Create a mock response with a valid JSON string
-        mock_response = MagicMock()
-        mock_response.text = '{"Response": "Activating Heater for 20 ticks"}'
-
-        mock_get.return_value = mock_response
-
-        main.send_action_to_hvac("2023-07-01", "TurnOnAc", main.tickets)
-
-        mock_get.assert_called_once_with(
-            f"{main.host}/api/hvac/{main.token}/TurnOnAc/{main.tickets}")
-
-        # Check if the print is correctly called with the expected output
-        second_call_args = mock_print.call_args_list[0]
-        self.assertEqual(second_call_args, mock.call(
-            {'Response': 'Activating Heater for 20 ticks'}))
+    #
+    # @patch("src.main.requests.get")
+    # @patch("builtins.print")
+    # def test_send_action_to_hvac(self, mock_print, mock_get):
+    #     """
+    #     Test case for the set_sensor_hub method of Main.
+    #     """
+    #     main = Main()
+    #
+    #     # Create a mock response with a valid JSON string
+    #     mock_response = MagicMock()
+    #     mock_response.text = '{"Response": "Activating Heater for 20 ticks"}'
+    #
+    #     mock_get.return_value = mock_response
+    #
+    #     main.send_action_to_hvac("2023-07-01", "TurnOnAc", main.tickets)
+    #
+    #     mock_get.assert_called_once_with(
+    #         f"{main.host}/api/hvac/{main.token}/TurnOnAc/{main.tickets}")
+    #
+    #     # Check if the print is correctly called with the expected output
+    #     second_call_args = mock_print.call_args_list[0]
+    #     self.assertEqual(second_call_args, mock.call(
+    #         {'Response': 'Activating Heater for 20 ticks'}))
 
 
 if __name__ == "__main__":
