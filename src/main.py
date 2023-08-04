@@ -117,6 +117,17 @@ class Main:
         self._hub_connection.on_error(lambda data: print(
             f"||| An exception was thrown closed: {data.error}"))
 
+    def transform_string_to_datetime(self, timestamp: str):
+        # Removing element after character '+' to convert to datetime object
+        timestamp_string_truncated = timestamp.split('+', 1)[0]
+
+        # Slicing last element of string and
+        # converting to datetime object for database insertion
+        timestamp_datetime_converted = datetime.strptime(
+            timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
+
+        return timestamp_datetime_converted
+
     def on_sensor_data_received(self, data):
         try:
             print("Receiving data...")
@@ -137,20 +148,34 @@ class Main:
     def send_action_to_hvac(self, date, action, nb_tick):
         result = requests.get(f"{self.host}/api/hvac/{self.token}/{action}/{nb_tick}")
         details = json.loads(result.text)
-        print(details)
+        event_message = details["Response"]
+        timestamp_datetime_converted = self.transform_string_to_datetime(date)
+
+        try:
+            with DBManager() as database:
+                print("Inserting data in database")
+                cursor = database.cursor
+                sql_query = f'''INSERT INTO OxygenCSEventMessages (DateCreated, EventMessage) VALUES (?, ?)'''
+                cursor.execute(sql_query, [timestamp_datetime_converted, event_message])
+                database.commit()
+                print("Inserting values in database...")
+        except requests.exceptions.RequestException as error:
+            print("Exception occurred while attempting to insert data in database. "
+                  f"Stacktrace: {error}")
 
     def send_event_to_database(self, timestamp, event):
-        print("Test New Image")
         table_name = "OxygenCSTemperatureData"
         column_names = ', '.join(["DateCreated", "Temperature"])
 
-        # Removing element after character '+' to convert to datetime object
-        timestamp_string_truncated = timestamp.split('+', 1)[0]
+        # # Removing element after character '+' to convert to datetime object
+        # timestamp_string_truncated = timestamp.split('+', 1)[0]
+        #
+        # # Slicing last element of string and
+        # # converting to datetime object for database insertion
+        # timestamp_datetime_converted = datetime.strptime(
+        #     timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
 
-        # Slicing last element of string and 
-        # converting to datetime object for database insertion
-        timestamp_datetime_converted = datetime.strptime(
-            timestamp_string_truncated[:-1], '%Y-%m-%dT%H:%M:%S.%f')
+        timestamp_datetime_converted = self.transform_string_to_datetime(timestamp)
 
         try:
             with DBManager() as database:
